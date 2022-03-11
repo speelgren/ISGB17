@@ -1,2 +1,6 @@
-# ISGB17
-Serverprogrammering i JavaScript
+# Serverprogrammering i JavaScript
+ISGB17
+
+Node.js
+
+Robin Johansson Speelgren
