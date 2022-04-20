@@ -2,5 +2,3 @@
 ISGB17
 
 Node.js
-
-Robin Johansson Speelgren
