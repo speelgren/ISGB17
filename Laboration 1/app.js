@@ -5,11 +5,13 @@
 const express = require('express');
 const jsDOM = require('jsdom');
 const fs = require('fs');
-const blogVektor = require('./blogPosts');
+const bloggVektor = require('./blogPosts');
+/* Används/behövs ej i express 4.16.0 och över (?) */
+//const bodyParser = require('body-parser');
 
 let app = express();
 
-//Middleware
+/* Middleware */
 app.use('/public', express.static(__dirname + '/public'));
 app.use(express.urlencoded( {extended : true} ));
 
@@ -27,51 +29,56 @@ app.get('/', function(request, response) {
             response.status(500).send('500 Server error');
         } else {
 
+            /* Skapar virtuell DOM från data: */
             let htmlCODE = data;
             let serverDOM = new jsDOM.JSDOM(htmlCODE);
             let document = serverDOM.window.document;
             let blogSection = document.querySelector('section');
 
-            for(let i = 0; i <= blogVektor.blogPosts.length - 1; i++) {
+            for(let i = 0; i < bloggVektor.blogPosts.length; i++) {
 
+                /* Skapar en div att lägga varje blogginlägg i. */
                 let blogDiv = document.createElement('div');
-                let h1Name = document.createElement('h1');
-                let h1Subject = document.createElement('h3');
-                let h1MessageBody = document.createElement('p');
-                let h1Time = document.createElement('h6');
 
-                let h1NameNode = document.createTextNode(blogVektor.blogPosts[i].nickName);
-                let h1SubjectNode = document.createTextNode(blogVektor.blogPosts[i].msgSubject);
-                let h1MessageBodyNode = document.createTextNode(blogVektor.blogPosts[i].msgBody);
-                let h1TimeStamp = document.createTextNode(blogVektor.blogPosts[i].timeStamp);
+                let h1Name = document.createElement('h1');
+                let h3Subject = document.createElement('h3');
+                let pMessageBody = document.createElement('p');
+                let h6Time = document.createElement('h6');
+
+                /* Skapar textnode med information från blogPosts-vektor. */
+                let h1NameNode = document.createTextNode(bloggVektor.blogPosts[i].nickName);
+                let h3SubjectNode = document.createTextNode(bloggVektor.blogPosts[i].msgSubject);
+                let pMessageBodyNode = document.createTextNode(bloggVektor.blogPosts[i].msgBody);
+                let h6TimeStamp = document.createTextNode(bloggVektor.blogPosts[i].timeStamp);
 
                 h1Name.appendChild(h1NameNode);
-                h1Subject.appendChild(h1SubjectNode);
-                h1MessageBody.appendChild(h1MessageBodyNode);
-                h1Time.appendChild(h1TimeStamp);
+                h3Subject.appendChild(h3SubjectNode);
+                pMessageBody.appendChild(pMessageBodyNode);
+                h6Time.appendChild(h6TimeStamp);
 
                 blogDiv.appendChild(h1Name);
-                blogDiv.appendChild(h1Subject);
-                blogDiv.appendChild(h1MessageBody);
-                blogDiv.appendChild(h1Time);
+                blogDiv.appendChild(h3Subject);
+                blogDiv.appendChild(pMessageBody);
+                blogDiv.appendChild(h6Time);
 
                 blogSection.appendChild(blogDiv);
             }
 
+            /* Konverterar virtuell DOM till textsträng. */
             htmlCODE = serverDOM.serialize();
             response.send(htmlCODE);
         }
     });
 });
 
+/* Läser in filen skriv.html och presenterar den
+ * när användaren besöker localhost:81/skriv */
 app.get('/skriv', function(request, response) {
 
     response.sendFile(__dirname + '/skriv.html');
 })
 
 app.post('/skriv', function(request, response) {
-
-    console.log(request.body.nickname);
 
         fs.readFile(__dirname + '/skriv.html', function(error, data) {
 
@@ -80,37 +87,51 @@ app.post('/skriv', function(request, response) {
                 console.log('fel: ' + error);
             } else {
 
+                /* Loggar ett JSON-objekt med allt som skickas med POST från /skriv.html-formuläret. 
+                 * Kan sedan välja ut just nickname, subject och msgbody från objektet.*/
+                console.log(request.body);
+
                 let name = request.body.nickname;
                 let subject = request.body.subject;
                 let messageBody = request.body.msgbody;
 
+                /* Namn minst 3 tecken.
+                 * Om fel dirigeras till localhost:81/skriv */
                 if(name < 3) {
 
                     response.redirect('/skriv');
                 }
 
-                if(subject < 10) {
+                /* Ämne minst 3 tecken.
+                 * Om fel dirigeras till localhost:81/skriv */
+                if(subject < 3) {
 
                     response.redirect('/skriv');
                 }
 
-                if(messageBody < 3) {
+                /* Inlägg minst 10 tecken.
+                 * Om fel dirigeras till localhost:81/skriv */
+                if(messageBody < 10) {
 
                     response.redirect('/skriv');
                 }
 
+                /* Skapar datum-objekt:
+                 * Använder toLocaleString()-metoden för att få utskriften "2022-05-04 16:10" 
+                 * istället för datum-objektets standardutskrift. */
                 let date = new Date();
-
-                blogVektor.blogPosts.push({
-                    nickName: request.body.nickname,
-                    msgSubject: request.body.subject,
-                    timeStamp: date.toLocaleString(
-                        'sv-SV', {
+                let time = date.toLocaleString('sv-SV', {
                                 timeZone: 'Europe/Stockholm',
                                 dateStyle: 'short',
                                 timeStyle: 'short',
-                    }),
-                    msgBody: request.body.msgbody
+                            });
+
+                /* Lägger till POST-info i slutet av blogPosts-vektorn. */
+                bloggVektor.blogPosts.push({
+                    nickName: name,
+                    msgSubject: subject,
+                    timeStamp: time,
+                    msgBody: messageBody
                 });
 
                 response.redirect('/');
