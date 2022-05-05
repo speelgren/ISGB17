@@ -5,7 +5,6 @@
 const express = require('express');
 const jsDOM = require('jsdom');
 const fs = require('fs');
-const http = require('http');
 const blogVektor = require('./blogPosts');
 
 let app = express();
@@ -32,7 +31,7 @@ app.get('/', function(request, response) {
             let serverDOM = new jsDOM.JSDOM(htmlCODE);
             let document = serverDOM.window.document;
             let blogSection = document.querySelector('section');
-            
+
             for(let i = 0; i <= blogVektor.blogPosts.length - 1; i++) {
 
                 let blogDiv = document.createElement('div');
@@ -50,7 +49,7 @@ app.get('/', function(request, response) {
                 h1Subject.appendChild(h1SubjectNode);
                 h1MessageBody.appendChild(h1MessageBodyNode);
                 h1Time.appendChild(h1TimeStamp);
-            
+
                 blogDiv.appendChild(h1Name);
                 blogDiv.appendChild(h1Subject);
                 blogDiv.appendChild(h1MessageBody);
