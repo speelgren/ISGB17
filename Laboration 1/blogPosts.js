@@ -14,5 +14,6 @@ blogPosts.push({
                 nisi.`
 });
 
+
 //Exportera array för import i annan fil.
 module.exports = { 'blogPosts': blogPosts };
