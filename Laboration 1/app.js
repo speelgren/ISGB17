@@ -6,7 +6,7 @@ const express = require('express');
 const jsDOM = require('jsdom');
 const fs = require('fs');
 const http = require('http');
-
+const blogPosts = require('./blogPosts');
 const bodyParser = require('body-parser');
 
 let app = express();
@@ -35,29 +35,15 @@ app.get('/', function(request, response) {
 
         if(error) {
 
-            response.status(500).send('500 Server Error');
+            response.status(500).send('500 Server error');
         } else {
 
-            console.log('File has been sent');
+            console.log('File sent');
         }
-    });
-});
+    })
+})
 
-app.get('/skriv', function(request, response) {
-
-    response.sendFile(__dirname + '/skriv.html', function(error) {
-
-        if(error) {
-
-            response.status(500).send('500 Server Error');
-        } else {
-
-            console.log('File has been sent');
-        }
-    });
-});
-
-app.post('/', function(request, response) {
+app.get('/', function(request, response) {
 
     fs.readFile(__dirname + '/index.html', function(error, data) {
 
@@ -67,12 +53,22 @@ app.post('/', function(request, response) {
         } else {
 
             let htmlCODE = data;
-
             let serverDOM = new jsDOM.JSDOM(htmlCODE);
+            let document = serverDOM.window.document;
+            let blogSection = document.querySelector('section');
 
-
-            htmlCODE = serverDOM.serialize();
-            response.send(htmlCODE);
+            response.end(htmlCODE.serialize());
         }
+
     });
+});
+
+app.get('/skriv', function(request, response) {
+
+    response.sendFile(__dirname + '/skriv.html');
+});
+
+app.post('/', function(request, response) {
+
+    fs.readFile(__dirname + '/index.html');
 });
