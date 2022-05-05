@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "express": "^4.18.1",
+    "jsdom": "^19.0.0"
+  },
+  "name": "laboration1",
+  "version": "1.0.0",
+  "description": "isgb17",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "keywords": [
+    "labb"
+  ],
+  "author": "speelgren",
+  "license": "ISC"
+}
