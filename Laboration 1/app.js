@@ -69,7 +69,7 @@ app.post('/', function(request, response) {
             let htmlCODE = data;
 
             let serverDOM = new jsDOM.JSDOM(htmlCODE);
-            
+
 
             htmlCODE = serverDOM.serialize();
             response.send(htmlCODE);
