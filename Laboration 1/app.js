@@ -57,9 +57,9 @@ app.get('/', function(request, response) {
             let document = serverDOM.window.document;
             let blogSection = document.querySelector('section');
 
-            response.end(htmlCODE.serialize());
+            htmlCODE = serverDOM.serialize();
+            response.send(htmlCODE);
         }
-
     });
 });
 
