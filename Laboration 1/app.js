@@ -6,8 +6,6 @@ const express = require('express');
 const jsDOM = require('jsdom');
 const fs = require('fs');
 const bloggVektor = require('./blogPosts');
-/* Används/behövs ej i express 4.16.0 och över (?) */
-//const bodyParser = require('body-parser');
 
 let app = express();
 
@@ -20,11 +18,11 @@ app.listen(81, function() {
     console.log('Servern är igång');
 });
 
-app.get('/', function(request, response) {
+app.get('/', function( request, response ) {
 
-    fs.readFile(__dirname + '/index.html', function(error, data) {
+    fs.readFile(__dirname + '/index.html', function( error, data ) {
 
-        if(error) {
+        if( error ) {
 
             response.status(500).send('500 Server error');
         } else {
@@ -73,21 +71,21 @@ app.get('/', function(request, response) {
 
 /* Läser in filen skriv.html och presenterar den
  * när användaren besöker localhost:81/skriv */
-app.get('/skriv', function(request, response) {
+app.get('/skriv', function( request, response ) {
 
     response.sendFile(__dirname + '/skriv.html');
 })
 
-app.post('/skriv', function(request, response) {
+app.post('/skriv', function( request, response ) {
 
-        fs.readFile(__dirname + '/skriv.html', function(error, data) {
+        fs.readFile(__dirname + '/skriv.html', function( error, data ) {
 
-            if(error) {
+            if( error ) {
 
                 console.log('fel: ' + error);
             } else {
 
-                /* Loggar ett JSON-objekt med allt som skickas med POST från /skriv.html-formuläret. 
+                /* Loggar ett JSON-objekt med allt som skickas med POST från /skriv.html-formuläret.
                  * Kan sedan välja ut just nickname, subject och msgbody från objektet.*/
                 console.log(request.body);
 
@@ -95,46 +93,32 @@ app.post('/skriv', function(request, response) {
                 let subject = request.body.subject;
                 let messageBody = request.body.msgbody;
 
-                /* Namn minst 3 tecken.
-                 * Om fel dirigeras till localhost:81/skriv */
-                if(name < 3) {
+                try {
 
-                    response.redirect('/skriv');
-                }
+                    if(Object.keys(name).length < 3) throw new Error ('Namn är för kort');
+                    if(Object.keys(subject).length < 3) throw new Error ('Ämne är för kort');
+                    if(Object.keys(messageBody).length < 10) throw new Error ('Inlägg är för kort');
 
-                /* Ämne minst 3 tecken.
-                 * Om fel dirigeras till localhost:81/skriv */
-                if(subject < 3) {
+                    /* Skapar datum-objekt:
+                     * Använder toISOString()-metoden för att få utskriften "2022-05-04"
+                     * istället för datum-objektets standardutskrift.
+                     * https://stackoverflow.com/questions/2013255/how-to-get-year-month-day-from-a-date-object */
+                    let date = new Date().toISOString().split('T')[0];
 
-                    response.redirect('/skriv');
-                }
-
-                /* Inlägg minst 10 tecken.
-                 * Om fel dirigeras till localhost:81/skriv */
-                if(messageBody < 10) {
-
-                    response.redirect('/skriv');
-                }
-
-                /* Skapar datum-objekt:
-                 * Använder toLocaleString()-metoden för att få utskriften "2022-05-04 16:10" 
-                 * istället för datum-objektets standardutskrift. */
-                let date = new Date();
-                let time = date.toLocaleString('sv-SV', {
-                                timeZone: 'Europe/Stockholm',
-                                dateStyle: 'short',
-                                timeStyle: 'short',
-                            });
-
-                /* Lägger till POST-info i slutet av blogPosts-vektorn. */
-                bloggVektor.blogPosts.push({
-                    nickName: name,
-                    msgSubject: subject,
-                    timeStamp: time,
-                    msgBody: messageBody
-                });
+                    /* Lägger till POST-info i slutet av blogPosts-vektorn. */
+                    bloggVektor.blogPosts.push({
+                        nickName: name,
+                        msgSubject: subject,
+                        timeStamp: date,
+                        msgBody: messageBody
+                    });
 
                 response.redirect('/');
+                } catch( error ) {
+
+                    console.log(error);
+                    response.redirect('/skriv');
+                }
             }
         });
 });
