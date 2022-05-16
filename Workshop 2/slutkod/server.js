@@ -3,21 +3,21 @@
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
-const myModule = require('./my-module.js');
+const mymodule = require('./my-module.js');
 const cookieParser = require('cookie-parser');
-const { response } = require('express');
+//const { response } = require('express');
 const io = require('socket.io')(http);
 
 app.use(cookieParser());
 app.use(express.urlencoded({ extended : true }));
 app.use('/public', express.static(__dirname + '/public'));
 
-let server = http.listen(81, () => {
+let server = http.listen(3001, () => {
 
     console.log('Server running on port ' + server.address().port);
 });
 
-app.get('/', function(request, response) {
+app.get('/index', function(request, response) {
 
     /* Kolla om nickname-kaka existerar */
     let cookie = request.cookies.nickName;
@@ -31,12 +31,14 @@ app.get('/', function(request, response) {
     }
 });
 
+/*
 app.get('/favicon.ico', function(request, respoonse) {
 
     response.sendFile(__dirname + '/favicon.ico');
 });
+*/
 
-app.post('/', function(request, response) {
+app.post('/index', function(request, response) {
 
     response.cookie('nickName', request.body.nickname, {maxAge: 1000*60*60});
     console.log('kaka satt');
@@ -46,7 +48,7 @@ app.post('/', function(request, response) {
 io.on('connection', function(socket) {
 
     let cookieString = socket.handshake.headers.cookie;
-    let cookieList = myModule.parseCookies(cookieString);
+    let cookieList = mymodule.parseCookies(cookieString);
 
     if(cookieList.nickName != null) {
 
@@ -55,11 +57,8 @@ io.on('connection', function(socket) {
 
     socket.on('newBackGround', function(data) {
 
-        io.emit('bytbild', {
-            'imgageid': data['background-id'],
-            'time': myModule.getTimeStamp(),
-            'name': socket.nickName,
-        });
+        io.emit('bytbild', {'imageid': data.backgroundid, 'time': mymodule.getTimeStamp(), 'name': socket.nickName, 'banana': 'yes'});
+
     });
 
 });

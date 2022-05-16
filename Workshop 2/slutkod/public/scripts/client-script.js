@@ -17,14 +17,12 @@ function sendNewBackgroundImage(event) {
     event.preventDefault();
 
     socket.emit('newBackGround', {
-        'background-id': event.target.getAttribute('data-birdid')
+        'backgroundid': event.target.getAttribute('data-birdid')
     });
 }
 
 socket.on('bytbild', function(data) {
 
     let body = document.querySelector('body');
-    body.setAttribute(
-        'style', 'background-image: url(´/public/images/´ + data.imageid + '.jpg')'
-        );
+    body.style.backgroundImage = `url(/public/images/${data.imageid}.jpg)`;
 });
