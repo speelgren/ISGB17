@@ -17,8 +17,13 @@ window.addEventListener('load', () => {
             /* Validerar längden på meddelandet */
             if(sendMSG.length < 3) throw new Error ('Meddelandet är för kort');
             
-            else 
-                sendNewMessage(sendMSG);
+            else {
+
+                /* emit till app.js socket */
+                socket.emit('newMessage', {
+                    'messageID' : sendMSG
+                });
+            }
 
                 /* Rensare textfältet efter meddelande skickats */
                 document.querySelector('#msg').value = null;
@@ -30,14 +35,6 @@ window.addEventListener('load', () => {
 
     });
 });
-
-/* emit till app.js socket */
-const sendNewMessage = (sendMSG) => {
-
-    socket.emit('newMessage', {
-        'messageID' : sendMSG
-    });
-}
 
 /* Mottagning av app.js socket data */
 socket.on('message', (data) => {
