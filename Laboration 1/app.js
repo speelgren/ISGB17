@@ -13,14 +13,14 @@ let app = express();
 app.use('/public', express.static(__dirname + '/public'));
 app.use(express.urlencoded( {extended : true} ));
 
-app.listen(81, function() {
+app.listen(81, () => {
 
     console.log('Servern är igång');
 });
 
-app.get('/', function( request, response ) {
+app.get('/', ( request, response ) => {
 
-    fs.readFile(__dirname + '/index.html', function( error, data ) {
+    fs.readFile(__dirname + '/index.html', ( error, data ) => {
 
         if( error ) {
 
@@ -71,14 +71,14 @@ app.get('/', function( request, response ) {
 
 /* Läser in filen skriv.html och presenterar den
  * när användaren besöker localhost:81/skriv */
-app.get('/skriv', function( request, response ) {
+app.get('/skriv', ( request, response ) => {
 
     response.sendFile(__dirname + '/skriv.html');
 })
 
-app.post('/skriv', function( request, response ) {
+app.post('/skriv', ( request, response ) => {
 
-        fs.readFile(__dirname + '/skriv.html', function( error, data ) {
+        fs.readFile(__dirname + '/skriv.html', ( error, data ) => {
 
             if( error ) {
 
@@ -87,7 +87,6 @@ app.post('/skriv', function( request, response ) {
 
                 /* Loggar ett JSON-objekt med allt som skickas med POST från /skriv.html-formuläret.
                  * Kan sedan välja ut just nickname, subject och msgbody från objektet.*/
-                console.log(request.body);
 
                 let name = request.body.nickname;
                 let subject = request.body.subject;

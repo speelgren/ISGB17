@@ -31,12 +31,10 @@ app.get('/index', function(request, response) {
     }
 });
 
-/*
 app.get('/favicon.ico', function(request, respoonse) {
 
     response.sendFile(__dirname + '/favicon.ico');
 });
-*/
 
 app.post('/index', function(request, response) {
 
