@@ -35,14 +35,16 @@ app.get('/loggain', (request, response) => {
 
 app.post('/', (request, response) => {
 
-  response.cookie('nickName', request.body.nickname);
+  response.cookie('nickName', request.body.nickname, {
+    maxAge: 1000*60*60*24,
+    httpOnly: true
+  });
 
   try {
 
     if(request.body.nickname.length < 3) throw new Error ('För kort nickname');
 
     response.redirect('/');
-    console.log('Cookie set.');
   } catch ( error ) {
 
     console.log(error);
@@ -57,13 +59,12 @@ app.get('/favicon.ico', (request, response) => {
 
 io.sockets.on('connection', (socket) => {
 
-  console.log('ny användare ansluten');
-
   let cookieString = socket.handshake.headers.cookie;
   let cookieList = cookieParser.JSONCookies(cookieString);
+
   let date = new Date().toISOString().split('T')[0];
   /* split('=')[1] för att ta bort "nickName=" ur cookieList */
-  let cookieName = cookieList.split('=')[1];
+  let cookieName = cookieList.split('nickName=')[1].split('; ');
 
   socket.on('newMessage', (data) => {
 

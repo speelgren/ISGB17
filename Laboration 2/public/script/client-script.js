@@ -9,6 +9,8 @@ window.addEventListener('load', () => {
   event.preventDefault();
   let sendMSG = document.querySelector('#msg').value;
 
+  console.log(socket);
+
     try {
 
       /* Validerar längden på meddelandet */
@@ -17,7 +19,7 @@ window.addEventListener('load', () => {
       else {
           /* emit till app.js socket */
           socket.emit('newMessage', {
-
+            
             'messageID' : sendMSG
           });
         }
