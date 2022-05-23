@@ -36,9 +36,18 @@ app.get('/loggain', (request, response) => {
 app.post('/', (request, response) => {
 
   response.cookie('nickName', request.body.nickname);
-  response.redirect('/');
 
-  console.log('Cookie set.');
+  try {
+
+    if(request.body.nickname.length < 3) throw new Error ('För kort nickname');
+
+    response.redirect('/');
+    console.log('Cookie set.');
+  } catch ( error ) {
+
+    console.log(error);
+    response.sendFile(__dirname + '/loggain.html');
+  }
 });
 
 app.get('/favicon.ico', (request, response) => {
