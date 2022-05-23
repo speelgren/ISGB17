@@ -5,6 +5,7 @@ const app = express();
 const http = require('http').createServer(app);
 const cookieParser = require('cookie-parser');
 const io = require('socket.io')(http);
+const cookieParse = require('cookie');
 
 app.use(cookieParser());
 app.use(express.urlencoded( { extended : true } ));
@@ -57,21 +58,19 @@ app.get('/favicon.ico', (request, response) => {
   response.sendFile(__dirname + '/favicon.ico');
 });
 
+/* Använder npm i cookie modul istället. */
 io.sockets.on('connection', (socket) => {
 
   let cookieString = socket.handshake.headers.cookie;
-  let cookieList = cookieParser.JSONCookies(cookieString);
-
+  let cookieObject = cookieParse.parse(cookieString);
   let date = new Date().toISOString().split('T')[0];
-  /* split('=')[1] för att ta bort "nickName=" ur cookieList */
-  let cookieName = cookieList.split('nickName=')[1].split('; ');
 
   socket.on('newMessage', (data) => {
 
       io.emit('message', {
 
           'date' : date,
-          'name' : cookieName,
+          'name' : cookieObject.nickName,
           'newMessage' : data.messageID,
       });
   });
