@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/public/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Guessing game</title>
+  </head>
+  <body>
+    <div class="container">
+		<main class="jumbotron text-center">
+			<h1>The Guessing game!</h1>
+		</main>
+
+		<div id="info_area" class="border border-2 border-success rounded mb-5" style="display: none;">
+			<h3 class="text-center">Information</h3>
+			<p id="status_text" class="mt-3 info-text">Gissa på ett nummer!</p>
+			<p id="guess_text" class="info-text">Du har gissat 0 gånger!</p> 
+		</div>
+
+		<div id="wait_area" class="text-center">
+			<h2>Väntar på spelare 2</h2>
+		</div>
+
+		<div id="start_area" class="text-center" style="display:none">
+			<h3>Tryck på knappen om du är redo att spela!</h3>
+			<input class="btn btn-primary" type="button" name="ready_btn" id="ready_btn" value="Jag är inte redo">
+		</div>
+ 	
+		 <div id="result_waiting_area" class="text-center" style="display:none">
+ 			<h2>Väntar på din motståndare!</h2>
+ 		</div>
+
+ 		<div id="result_area" class="text-center" style="display:none">
+ 			<table class="table">
+			  <thead>
+			    <tr>
+			      <th scope="col">Spelare</th>
+			      <th scope="col">Drag</th>
+			      <th scope="col">Vinnare</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+			    <tr>
+			      <td id="result_area_p1Name"></td>
+			      <td id="result_area_p1Moves"></td>
+			      <td id="result_area_p1Winner"></td>
+			    </tr>
+			    <tr>
+			      <td id="result_area_p2Name"></td>
+			      <td id="result_area_p2Moves"></td>
+			      <td id="result_area_p2Winner"></td>
+			    </tr>
+			  </tbody>
+			</table>
+ 			<input type="button" id="replay_btn" name="replay_btn" value="Spela igen?" class="btn btn-primary">
+ 		</div>
+
+ 		<div id="game_area" style="display:none" class="row center-row">
+			<div class="col-12 text-center">
+				<h2 for="input">Gissa på ett nummer</h2>
+			</div>
+			<div class="col-12 mt-3">
+				<input type="number" id="guess_num" name="guess_num" class="w-100 num-input" min="0" max="10" value="0">
+			</div>
+			<div class="col-12 mt-3 text-center">
+				<input type="button" name="guess_btn" id="guess_btn" class="btn btn-dark w-50" value="Gissa på 0">
+			</div>
+		</div>
+	</div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="public/client-script.js"></script>
+  </body>
+</html>
