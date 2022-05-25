@@ -2,7 +2,7 @@
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const globalObject = require('./tenta-modul.js');
+const globalObject = require(__dirname + '/tenta-modul.js');
 
 const app = express();
 const http = require('http').createServer(app);
@@ -13,9 +13,9 @@ app.use(cookieParser());
 app.use(express.urlencoded( {extended : true } ));
 app.use('/public', express.static(__dirname + '/public'));
 
-let server = http.listen(3000, () => {
+let server = http.listen(3001, () => {
 
-  console.log(`Server is running on PORT ${server.adress().port}`);
+  console.log(`Server is running on PORT ${server.address().port}`);
 });
 
 app.get('/', (request, response) => {
@@ -23,9 +23,9 @@ app.get('/', (request, response) => {
   let namn = request.cookies.namn;
   let gdpr = request.cookies.gdpr;
 
-  if(namn === undefined || gdpr === undefined ) {
+  if(namn === undefined || gdpr === undefined) {
 
-    response.sendFile(__dirname + '/loggain.html');
+    response.sendFile(__dirname + '/login.html');
   } else {
 
     response.sendFile(__dirname + '/index.html');
@@ -34,10 +34,13 @@ app.get('/', (request, response) => {
 
 app.post('/', (request, response) => {
 
+  let namn = request.body.namn;
+  let gdpr = request.body.gdpr;
+
   try {
 
-    if(namn == null) throw new Error ('Du måste ange ett namn');
-    if(namn < 5) throw new Error ('Namnet måste vara minst 5 vecken långt');
+    if(namn === '') throw new Error ('Du måste ange ett namn');
+    if(namn.length < 5) throw new Error ('Namnet måste vara minst 5 vecken långt');
     if(!globalObject.isFirstUpperCase(namn)) throw new Error ('Namnet måste börja med en versal');
     if(gdpr === undefined) throw new Error ('Du måste tillåta att ingen data kommer att sparas!');
 
@@ -71,15 +74,15 @@ io.on('connection', function(socket) {
 
     if(io.engine.clientsCount === 1) {
 
-      cookielist.namn = globalObject.playerOneName;
-      globalObject.playerOneRead = false;
-      globalObject.playerOneSocketId = 0;
+      globalObject.playerOneName = cookielist.namn;
+      globalObject.playerOneReady = false;
+      globalObject.playerOneSocketId = socket.id;
       globalObject.playerOneTotalMoves = 0;
     } else if(io.engine.clientsCount === 2) {
 
-      cookielist.namn = globalObject.playerTwoName;
-      globalObject.playerTwoRead = false;
-      globalObject.playerTwoSocketId = 0;
+      globalObject.playerTwoName = cookielist.namn;
+      globalObject.playerTwoReady = false;
+      globalObject.playerTwoSocketId = socket.id;
       globalObject.playerTwoTotalMoves = 0;
     } else {
 
@@ -107,6 +110,38 @@ io.on('connection', function(socket) {
       io.to(globalObject.playerTwoSocketId).emit('game-start');
 
       globalObject.currentNumber = globalObject.getARandomNumber(0, 10);
+    }
+  });
+
+  socket.on('player-play', (number) => {
+
+    let status = 0;
+    if(number > globalObject.currentNumber) {
+
+      status = 1;
+    } else if(number < globalObject.currentNumber) {
+
+      status = -1;
+    }
+
+    if(socket.id === globalObject.playerOneSocketId) {
+
+      globalObject.playerOneTotalMoves++;
+      io.to(globalObject.playerOneSocketId).emit('game-status', {
+
+        'status': status,
+        'totalMoves': globalObject.playerOneTotalMoves,
+        'lastNumber': number
+      });
+    } else if(socket.id === globalObject.playerTwoSocketId) {
+
+      globalObject.playerTwoTotalMoves++;
+      io.to(globalObject.playerTwoSocketId).emit('game-status', {
+
+        'status': status,
+        'totalMoves': globalObject.playerTwoTotalMoves,
+        'lastNumber': number
+      });
     }
   });
 
@@ -142,7 +177,15 @@ io.on('connection', function(socket) {
         'p2Winner': p2Status,
         'p1Name': globalObject.playerOneName,
         'p1TotalMoves': globalObject.playerOneTotalMoves,
-        'p2TotalMoves': globalObject.playerTwoTotalMoves,
+        'p2Name': globalObject.playerTwoName,
+        'p2TotalMoves': globalObject.playerTwoTotalMoves
+      });
+    io.to(globalObject.playerTwoSocketId).emit('game-score', {
+
+        'p1Winner': p1Status,
+        'p2Winner': p2Status,
+        'p1Name': globalObject.playerOneName,
+        'p1TotalMoves': globalObject.playerOneTotalMoves,
         'p2Name': globalObject.playerTwoName,
         'p2TotalMoves': globalObject.playerTwoTotalMoves
       });
