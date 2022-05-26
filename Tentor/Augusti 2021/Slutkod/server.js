@@ -13,7 +13,7 @@ app.use(cookieParser());
 app.use(express.urlencoded( {extended : true } ));
 app.use('/public', express.static(__dirname + '/public'));
 
-let server = http.listen(3001, () => {
+let server = http.listen(3000, () => {
 
   console.log(`Server is running on PORT ${server.address().port}`);
 });
